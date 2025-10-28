@@ -1,0 +1,84 @@
+{
+  "name": "楽天ウォレット Pro - AI売買サポート",
+  "short_name": "楽天ウォレット",
+  "description": "AIとテクニカル分析による暗号資産トレーディングシグナル。価格アラート機能付き",
+  "start_url": "./rakuten-wallet-pwa.html",
+  "display": "standalone",
+  "background_color": "#bf0000",
+  "theme_color": "#bf0000",
+  "orientation": "portrait",
+  "scope": "./",
+  "lang": "ja",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%23bf0000'/><text x='96' y='140' font-size='110' text-anchor='middle' fill='white'>🛒</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23bf0000'/><text x='256' y='370' font-size='290' text-anchor='middle' fill='white'>🛒</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect width='540' height='720' fill='%23bf0000'/><text x='270' y='360' font-size='80' text-anchor='middle' fill='white'>楽天ウォレット Pro</text></svg>",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["finance", "business", "productivity"],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "最新価格",
+      "short_name": "価格",
+      "description": "暗号資産の最新価格を確認",
+      "url": "./rakuten-wallet-pwa.html#prices",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' fill='%23bf0000'/><text x='48' y='70' font-size='50' text-anchor='middle'>📊</text></svg>",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "売買シグナル",
+      "short_name": "シグナル",
+      "description": "AI売買シグナルを確認",
+      "url": "./rakuten-wallet-pwa.html#signals",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' fill='%23bf0000'/><text x='48' y='70' font-size='50' text-anchor='middle'>🎯</text></svg>",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "アラート設定",
+      "short_name": "アラート",
+      "description": "価格アラートを設定",
+      "url": "./rakuten-wallet-pwa.html#alerts",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' fill='%23bf0000'/><text x='48' y='70' font-size='50' text-anchor='middle'>🔔</text></svg>",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "./rakuten-wallet-pwa.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "coin_name",
+      "text": "price_data"
+    }
+  }
+}

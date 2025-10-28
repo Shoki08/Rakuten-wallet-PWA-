@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#bf0000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="楽天ウォレット Pro">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%23bf0000'/><text x='90' y='130' font-size='100' text-anchor='middle' fill='white'>🛒</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23bf0000'/><text x='50' y='65' font-size='60' text-anchor='middle' fill='white'>🛒</text></svg>">
+    <link rel="manifest" href="./rakuten-manifest.json">
+    <title>楽天ウォレット Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #bf0000 0%, #8b0000 100%);
+            color: #fff;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) 15px env(safe-area-inset-left);
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-top: 10px;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            color: #ffcccc;
+            font-size: 1.1em;
+        }
+        
+        .badge {
+            background: #ffd700;
+            color: #bf0000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .pwa-install-banner {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #bf0000;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .pwa-install-banner.show {
+            display: flex;
+        }
+        
+        .install-btn {
+            background: #bf0000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .notification-banner {
+            background: rgba(255, 215, 0, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .notification-banner.show {
+            display: block;
+        }
+        
+        .notification-banner h3 {
+            color: #bf0000;
+            margin-bottom: 8px;
+        }
+        
+        .notification-banner p {
+            color: #333;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        
+        .api-status {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .api-status.loading {
+            background: #fbbf24;
+            color: #1a1f3a;
+        }
+        
+        .api-status.success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .api-status.error {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .controls {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .control-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-group label {
+            color: #ffcccc;
+            font-weight: 600;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+        
+        select, button {
+            background: rgba(255, 255, 255, 0.9);
+            color: #bf0000;
+            border: 2px solid #bf0000;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s;
+            -webkit-appearance: none;
+            appearance: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        select:active, button:active {
+            background: white;
+            transform: scale(0.95);
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .summary-card .label {
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card .value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .summary-card.buy .value {
+            color: #10b981;
+        }
+        
+        .summary-card.sell .value {
+            color: #ef4444;
+        }
+        
+        .summary-card.hold .value {
+            color: #fbbf24;
+        }
+        
+        .coins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .coin-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+        
+        .coin-card.signal-buy, .coin-card.signal-strong-buy {
+            border-color: #10b981;
+        }
+        
+        .coin-card.signal-sell, .coin-card.signal-strong-sell {
+            border-color: #ef4444;
+        }
+        
+        .coin-card.signal-hold {
+            border-color: #fbbf24;
+        }
+        
+        .coin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .coin-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .coin-symbol {
+            font-size: 0.85em;
+            color: #666;
+            background: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 5px;
+        }
+        
+        .price-section {
+            margin: 12px 0;
+        }
+        
+        .price {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .change {
+            font-size: 1em;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        
+        .change.positive {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .change.negative {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .signal-badge {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 12px 0;
+            text-align: center;
+        }
+        
+        .signal-badge.strong-buy {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .signal-badge.buy {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            color: white;
+        }
+        
+        .signal-badge.hold {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #1a1f3a;
+        }
+        
+        .signal-badge.sell {
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+            color: white;
+        }
+        
+        .signal-badge.strong-sell {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .indicators {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .indicator {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
+        
+        .indicator-name {
+            color: #666;
+            font-size: 0.8em;
+            margin-bottom: 3px;
+        }
+        
+        .indicator-value {
+            font-weight: bold;
+            color: #333;
+            font-size: 1em;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 12px;
+            height: 150px;
+        }
+        
+        .recommendation {
+            background: rgba(191, 0, 0, 0.1);
+            border-left: 4px solid #bf0000;
+            padding: 10px;
+            margin-top: 12px;
+            border-radius: 5px;
+            color: #333;
+            font-size: 0.85em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .update-info {
+            color: #ffcccc;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #c00;
+            font-size: 0.9em;
+        }
+        
+        .alert-settings {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-settings h3 {
+            color: #bf0000;
+            margin-bottom: 10px;
+        }
+        
+        .alert-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .alert-item label {
+            color: #333;
+            font-size: 0.9em;
+        }
+        
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: #ccc;
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #10b981;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+        
+        .toggle-switch.active::after {
+            left: 26px;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: env(safe-area-inset-bottom);
+            left: 0;
+            right: 0;
+            background: rgba(191, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+        
+        .nav-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 0.8em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        .nav-btn:active {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .nav-icon {
+            font-size: 1.5em;
+        }
+        
+        @media (max-width: 768px) {
+            .coins-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.6em;
+            }
+            
+            .control-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .control-group {
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- PWAインストールバナー -->
+        <div id="install-banner" class="pwa-install-banner">
+            <div>
+                <strong>📱 ホーム画面に追加</strong>
+                <p style="margin: 5px 0 0; font-size: 0.85em;">価格変動をすばやくチェック</p>
+            </div>
+            <button class="install-btn" onclick="installPWA()">追加</button>
+        </div>
+        
+        <!-- 通知許可バナー -->
+        <div id="notification-banner" class="notification-banner">
+            <h3>🔔 価格アラートを有効化</h3>
+            <p>目標価格や大きな価格変動を通知でお知らせします</p>
+            <button style="background: #bf0000; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="requestNotificationPermission()">通知を有効にする</button>
+        </div>
+        
+        <div class="header">
+            <div style="font-size: 2.5em; margin-bottom: 10px;">🛒</div>
+            <h1>楽天ウォレット Pro</h1>
+            <div class="subtitle">AI搭載トレーディングシグナル</div>
+            <div class="badge">📊 PWA対応版</div>
+        </div>
+        
+        <div id="api-status" class="api-status loading">
+            <strong>📡 データ取得中...</strong>
+        </div>
+        
+        <div class="controls">
+            <div class="control-row">
+                <div class="control-group">
+                    <label>表示順:</label>
+                    <select id="sort-order">
+                        <option value="signal">シグナル順</option>
+                        <option value="change">変動率順</option>
+                        <option value="name">名前順</option>
+                        <option value="volume">出来高順</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>更新:</label>
+                    <select id="update-interval">
+                        <option value="30" selected>30秒</option>
+                        <option value="60">1分</option>
+                        <option value="180">3分</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-row">
+                <div class="control-group">
+                    <label>表示:</label>
+                    <select id="display-mode">
+                        <option value="all">全て表示</option>
+                        <option value="buy">買いのみ</option>
+                        <option value="sell">売りのみ</option>
+                    </select>
+                </div>
+                <button id="refresh-btn">🔄 更新</button>
+            </div>
+        </div>
+        
+        <div class="summary-cards">
+            <div class="summary-card buy">
+                <div class="label">買い推奨</div>
+                <div class="value" id="buy-count">-</div>
+            </div>
+            <div class="summary-card hold">
+                <div class="label">様子見</div>
+                <div class="value" id="hold-count">-</div>
+            </div>
+            <div class="summary-card sell">
+                <div class="label">売り推奨</div>
+                <div class="value" id="sell-count">-</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">最高変動</div>
+                <div class="value" id="top-change" style="color: #bf0000;">-</div>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            データ取得中...
+        </div>
+        
+        <div id="error-container"></div>
+        
+        <div id="coins-container" class="coins-grid" style="display: none;"></div>
+        
+        <div class="footer">
+            <div class="update-info">
+                最終更新: <span id="update-time">--</span><br>
+                次回更新: <span id="countdown">--</span>秒後
+            </div>
+            <div style="color: #ffcccc; font-size: 0.85em; margin-top: 8px;">
+                データ: CoinGecko API | チャート: Chart.js
+            </div>
+        </div>
+    </div>
+    
+    <div class="bottom-nav">
+        <button class="nav-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+            <span class="nav-icon">⬆️</span>
+            <span>トップ</span>
+        </button>
+        <button class="nav-btn" onclick="document.getElementById('refresh-btn').click()">
+            <span class="nav-icon">🔄</span>
+            <span>更新</span>
+        </button>
+        <button class="nav-btn" onclick="toggleFavorites()">
+            <span class="nav-icon">⭐</span>
+            <span>お気に入り</span>
+        </button>
+        <button class="nav-btn" onclick="shareApp()">
+            <span class="nav-icon">📤</span>
+            <span>共有</span>
+        </button>
+    </div>
+    
+    <script src="./rakuten-app.js"></script>
+</body>
+</html>
